@@ -1,0 +1,13 @@
+**/target
+trash/
+Cargo.lock
+*.bak
+
+.vscode/
+
+_*.rs
+
+
+# Added by cargo
+
+/target
