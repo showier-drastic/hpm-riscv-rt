@@ -26,8 +26,8 @@ keywords = ["hpmicro", "hpm", "riscv"]
 readme = "README.md"
 
 [dependencies]
-# andes-riscv = { version = "0.1.0", path = "../../andes-riscv" }
-andes-riscv = "0.1.0"
+# andes-riscv = { version = "0.1.1", path = "../../andes-riscv" }
+andes-riscv = "0.1.1"
 hpm-riscv-rt-macros = { version = "0.1.0", path = "macros" }
 
 [features]
