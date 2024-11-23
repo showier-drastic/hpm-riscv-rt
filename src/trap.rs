@@ -1,6 +1,6 @@
 use core::arch::global_asm;
 
-use andes_riscv::riscv::register::{mcause, mtval};
+use andes_riscv::riscv::register::mcause;
 
 /// Registers saved in trap handler
 #[allow(missing_docs)]
@@ -143,7 +143,7 @@ unsafe extern "C" fn _start_rust_CORE_LOCAL(trap_frame: *const TrapFrame) {
         #[cfg(feature = "hpm67-fix")]
         if code == 2 {
             // Illegal instruction
-            if mtval::read() == 0x0 {
+            if andes_riscv::riscv::register::mtval::read() == 0x0 {
                 return;
             }
         }
