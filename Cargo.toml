@@ -1,0 +1,41 @@
+[workspace]
+members = ["macros"]
+
+[workspace.package]
+authors = ["Andelf <andelf@gmail.com>"]
+repository = "https://github.com/hpmicro-rs/hpm-riscv-rt"
+documentation = "https://docs.rs/hpm-riscv"
+homepage = "https://github.com/hpmicro-rs/hpm-riscv-rt"
+categories = ["embedded", "no-std", "hardware-support"]
+license = "MIT/Apache-2.0"
+version = "0.1.0"                                         # for rt and macros
+edition = "2021"
+
+[package]
+name = "hpm-riscv-rt"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+repository.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+categories.workspace = true
+license.workspace = true
+description = "Low level access to HPMicro's RISC-V processors"
+keywords = ["hpmicro", "hpm", "riscv"]
+readme = "README.md"
+
+[dependencies]
+# andes-riscv = { version = "0.1.0", path = "../../andes-riscv" }
+andes-riscv = "0.1.0"
+hpm-riscv-rt-macros = { version = "0.1.0", path = "macros" }
+
+[features]
+default = []
+
+hpm67-fix = []
+single-hart = []
+
+
+[package.metadata.docs.rs]
+targets = ["riscv32imafc-unknown-none-elf"]
