@@ -43,6 +43,7 @@ pub fn DefaultInterruptHandler() {
         // see rust-lang/rust#28728 for details
         continue;
     }
+    // it's ok to use this both as Core and External interrupt handler, because it never returns
 }
 
 extern "C" {

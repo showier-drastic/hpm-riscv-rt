@@ -231,15 +231,12 @@ pub fn interrupt(args: TokenStream, input: TokenStream) -> TokenStream {
         });
     }
 
-    f.sig.ident = Ident::new(
-        &format!("__hpm_riscv_rt_isr_{}", link_name),
-        Span::call_site(),
-    );
+    f.sig.ident = Ident::new(&link_name, Span::call_site());
 
     quote!(
         #[allow(non_snake_case)]
         #[link_section = ".isr_vector"]
-        #[link_name = #link_name]
+        #[no_mangle]
         #f
     )
     .into()

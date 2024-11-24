@@ -25,13 +25,14 @@ PROVIDE(InstructionPageFault = ExceptionHandler);
 PROVIDE(LoadPageFault = ExceptionHandler);
 PROVIDE(StorePageFault = ExceptionHandler);
 
-PROVIDE(SupervisorSoft = DefaultHandler);
-PROVIDE(MachineSoft = DefaultHandler);
-PROVIDE(SupervisorTimer = DefaultHandler);
-PROVIDE(MachineTimer = DefaultHandler);
-PROVIDE(SupervisorExternal = DefaultHandler);
-PROVIDE(MachineExternal = DefaultHandler);
+PROVIDE(SupervisorSoft = DefaultCoreInterruptHandler);
+PROVIDE(MachineSoft = DefaultCoreInterruptHandler);
+PROVIDE(SupervisorTimer = DefaultCoreInterruptHandler);
+PROVIDE(MachineTimer = DefaultCoreInterruptHandler);
+PROVIDE(SupervisorExternal = DefaultCoreInterruptHandler);
+PROVIDE(MachineExternal = DefaultCoreInterruptHandler);
 
+PROVIDE(DefaultCoreInterruptHandler = DefaultInterruptHandler);
 PROVIDE(DefaultHandler = DefaultInterruptHandler);
 PROVIDE(ExceptionHandler = DefaultExceptionHandler);
 
