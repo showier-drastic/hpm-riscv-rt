@@ -11,3 +11,4 @@ _*.rs
 # Added by cargo
 
 /target
+trash/
