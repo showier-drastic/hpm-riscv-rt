@@ -3,10 +3,7 @@
 
 use core::arch::global_asm;
 
-use andes_riscv::{
-    register::mmisc_ctl,
-    riscv::register::{mcounteren, mie, mstatus, mtvec, stvec::TrapMode},
-};
+use andes_riscv::riscv::register::{mcounteren, mie, mstatus, mtvec, stvec::TrapMode};
 
 pub use hpm_riscv_rt_macros::{entry, fast, interrupt, pre_init};
 
@@ -282,8 +279,6 @@ unsafe extern "C" fn _start_rust() -> ! {
     );
 
     _setup_interrupts();
-
-    mmisc_ctl().modify(|w| w.set_ace(true));
 
     // enable FPU
     mstatus::set_fs(mstatus::FS::Clean);
