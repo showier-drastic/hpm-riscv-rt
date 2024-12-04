@@ -27,7 +27,7 @@ readme = "README.md"
 
 [dependencies]
 # andes-riscv = { version = "0.1.1", path = "../../andes-riscv" }
-andes-riscv = "0.1.1"
+andes-riscv = "0.1.2"
 hpm-riscv-rt-macros = { version = "0.1.1", path = "macros" }
 
 [features]
