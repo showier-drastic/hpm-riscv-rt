@@ -4,6 +4,8 @@ PROVIDE(_stack_size = 0x4000);
 __stack_size = DEFINED(_stack_size) ? _stack_size : 0x4000;
 ASSERT(__stack_size >= 0x400, "Stack size too small");
 
+PROVIDE(_flash_config = 0x80000400);
+PROVIDE(_boot_header = 0x80001000);
 PROVIDE(_stext = ORIGIN(REGION_TEXT));
 PROVIDE(_stack_start = ORIGIN(REGION_STACK) + LENGTH(REGION_STACK));
 PROVIDE(_max_hart_id = 0);
@@ -39,6 +41,18 @@ PROVIDE(ExceptionHandler = DefaultExceptionHandler);
 
 SECTIONS
 {
+    .flash_config _flash_config:
+    {
+        KEEP(*(.flash_config));
+    } > REGION_HEADER
+    
+    .boot_header _boot_header :
+    {
+        __boot_header_start__ = .;
+        KEEP(*(.boot_header));
+        KEEP(*(.fw_info_table));
+    } > REGION_HEADER
+
     .start : {
         . = ALIGN(8);
         KEEP(*(.start))
@@ -191,6 +205,14 @@ SECTIONS
 
     .eh_frame (INFO) : { KEEP(*(.eh_frame)) }
     .eh_frame_hdr (INFO) : { *(.eh_frame_hdr) }
+
+    .flash_end :
+    {
+        __flash_end__ = .;
+    } > XPI0_APP
+
+    __fw_size__ = __flash_end__ - _start;
+    __fw_offset__ = _start - __boot_header_start__;
 }
 
 /* Do not exceed this mark in the error messages above                                    | */
