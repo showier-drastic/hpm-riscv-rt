@@ -3,7 +3,10 @@
 
 use core::arch::global_asm;
 
-use andes_riscv::riscv::register::{mcounteren, mie, mstatus, mtvec, stvec::TrapMode};
+use andes_riscv::{
+    register::mmisc_ctl,
+    riscv::register::{mcounteren, mie, mstatus, mtvec, stvec::TrapMode},
+};
 
 pub use hpm_riscv_rt_macros::{entry, fast, interrupt, pre_init};
 
