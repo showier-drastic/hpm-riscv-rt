@@ -4,8 +4,6 @@ PROVIDE(_stack_size = 0x4000);
 __stack_size = DEFINED(_stack_size) ? _stack_size : 0x4000;
 ASSERT(__stack_size >= 0x400, "Stack size too small");
 
-PROVIDE(_flash_config = 0x80000400);
-PROVIDE(_boot_header = 0x80001000);
 PROVIDE(_stext = ORIGIN(REGION_TEXT));
 PROVIDE(_stack_start = ORIGIN(REGION_STACK) + LENGTH(REGION_STACK));
 PROVIDE(_max_hart_id = 0);
@@ -41,12 +39,12 @@ PROVIDE(ExceptionHandler = DefaultExceptionHandler);
 
 SECTIONS
 {
-    .flash_config _flash_config:
+    .flash_config 0x80000400 :
     {
         KEEP(*(.flash_config));
     } > REGION_HEADER
-    
-    .boot_header _boot_header :
+
+    .boot_header 0x80001000 :
     {
         __boot_header_start__ = .;
         KEEP(*(.boot_header));
