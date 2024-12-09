@@ -1,7 +1,7 @@
 #![no_std]
 #![feature(abi_riscv_interrupt)]
 
-use core::arch::global_asm;
+use core::{arch::global_asm, mem};
 
 use andes_riscv::{
     register::mmisc_ctl,
@@ -118,6 +118,24 @@ unsafe extern "C" fn _setup_interrupts() {
     }
 }
 
+unsafe fn memory_copy_range(dst_start: *mut u32, dst_end: *mut u32, src_start: *const u32) {
+    let mut dst = dst_start;
+    let mut src = src_start;
+    while dst < dst_end {
+        *dst = *src;
+        dst = dst.add(1);
+        src = src.add(1);
+    }
+}
+
+unsafe fn memory_clear_range(start: *mut u32, end: *mut u32) {
+    let mut dst = start;
+    while dst < end {
+        *dst = 0;
+        dst = dst.add(1);
+    }
+}
+
 #[no_mangle]
 unsafe extern "C" fn _start_rust() -> ! {
     andes_riscv::l1c::ic_enable();
@@ -128,160 +146,77 @@ unsafe extern "C" fn _start_rust() -> ! {
         fn main() -> !;
     }
 
-    core::arch::asm!(
-        "
-        la      {start}, __vector_ram_start__
-        la      {end}, __vector_ram_end__
-        la      {input}, __vector_load_addr__
+    extern "C" {
+        static mut __vector_ram_start__: u32;
+        static mut __vector_ram_end__: u32;
+        static __vector_load_addr__: u32;
 
-        bgeu    {start},{end},2f
-    1:
-        lw      {a},0({input})
-        addi    {input},{input},4
-        sw      {a},0({start})
-        addi    {start},{start},4
-        bltu    {start},{end},1b
-    2:
-        ",
-        start = out(reg) _,
-        end = out(reg) _,
-        input = out(reg) _,
-        a = out(reg) _,
-    );
+        static mut __data_start__: u32;
+        static mut __data_end__: u32;
+        static __data_load_addr__: u32;
 
-    core::arch::asm!(
-        "
-        la      {start}, __data_start__
-        la      {end}, __data_end__
-        la      {input}, __data_load_addr__
+        static mut __fast_text_start__: u32;
+        static mut __fast_text_end__: u32;
+        static __fast_text_load_addr__: u32;
 
-        bgeu    {start},{end},2f
-    1:
-        lw      {a},0({input})
-        addi    {input},{input},4
-        sw      {a},0({start})
-        addi    {start},{start},4
-        bltu    {start},{end},1b
-    2:
-        ",
-        start = out(reg) _,
-        end = out(reg) _,
-        input = out(reg) _,
-        a = out(reg) _,
-    );
+        static mut __fast_data_start__: u32;
+        static mut __fast_data_end__: u32;
+        static __fast_data_load_addr__: u32;
 
-    core::arch::asm!(
-        "
-        la      {start}, __fast_text_start__
-        la      {end}, __fast_text_end__
-        la      {input}, __fast_text_load_addr__
+        static mut __noncacheable_data_start__: u32;
+        static mut __noncacheable_data_end__: u32;
+        static __noncacheable_data_load_addr__: u32;
 
-        bgeu    {start},{end},2f
-    1:
-        lw      {a},0({input})
-        addi    {input},{input},4
-        sw      {a},0({start})
-        addi    {start},{start},4
-        bltu    {start},{end},1b
-    2:
-        ",
-        start = out(reg) _,
-        end = out(reg) _,
-        input = out(reg) _,
-        a = out(reg) _,
-    );
+        static mut __bss_start__: u32;
+        static mut __bss_end__: u32;
 
-    core::arch::asm!(
-        "
-        la      {start}, __fast_data_start__
-        la      {end}, __fast_data_end__
-        la      {input}, __fast_data_load_addr__
+        static mut __fast_bss_start__: u32;
+        static mut __fast_bss_end__: u32;
 
-        bgeu    {start},{end},2f
-    1:
-        lw      {a},0({input})
-        addi    {input},{input},4
-        sw      {a},0({start})
-        addi    {start},{start},4
-        bltu    {start},{end},1b
-    2:
-        ",
-        start = out(reg) _,
-        end = out(reg) _,
-        input = out(reg) _,
-        a = out(reg) _,
-    );
+        static mut __noncacheable_bss_start__: u32;
+        static mut __noncacheable_bss_end__: u32;
+    }
 
-    core::arch::asm!(
-        "
-        la      {start}, __noncacheable_data_start__
-        la      {end}, __noncacheable_data_end__
-        la      {input}, __noncacheable_data_load_addr__
+    unsafe {
+        memory_copy_range(
+            &raw mut __vector_ram_start__,
+            &raw mut __vector_ram_end__,
+            &raw const __vector_load_addr__,
+        );
 
-        bgeu    {start},{end},2f
-    1:
-        lw      {a},0({input})
-        addi    {input},{input},4
-        sw      {a},0({start})
-        addi    {start},{start},4
-        bltu    {start},{end},1b
-    2:
-        ",
-        start = out(reg) _,
-        end = out(reg) _,
-        input = out(reg) _,
-        a = out(reg) _,
-    );
+        memory_copy_range(
+            &raw mut __data_start__,
+            &raw mut __data_end__,
+            &raw const __data_load_addr__,
+        );
 
-    // zero-out the bss section
+        memory_copy_range(
+            &raw mut __fast_text_start__,
+            &raw mut __fast_text_end__,
+            &raw const __fast_text_load_addr__,
+        );
 
-    core::arch::asm!(
-        "
-        la      {start}, __bss_start__
-        la      {end}, __bss_end__
+        memory_copy_range(
+            &raw mut __fast_data_start__,
+            &raw mut __fast_data_end__,
+            &raw const __fast_data_load_addr__,
+        );
 
-        bgeu    {start},{end},2f
-    1:
-        sw      zero,0({start})
-        addi    {start},{start},4
-        bltu    {start},{end},1b
-    2:
-        ",
-        start = out(reg) _,
-        end = out(reg) _,
-    );
+        memory_copy_range(
+            &raw mut __noncacheable_data_start__,
+            &raw mut __noncacheable_data_end__,
+            &raw const __noncacheable_data_load_addr__,
+        );
 
-    core::arch::asm!(
-        "
-        la      {start}, __fast_bss_start__
-        la      {end}, __fast_bss_end__
+        memory_clear_range(&raw mut __bss_start__, &raw mut __bss_end__);
 
-        bgeu    {start},{end},2f
-    1:
-        sw      zero,0({start})
-        addi    {start},{start},4
-        bltu    {start},{end},1b
-    2:
-        ",
-        start = out(reg) _,
-        end = out(reg) _,
-    );
+        memory_clear_range(&raw mut __fast_bss_start__, &raw mut __fast_bss_end__);
 
-    core::arch::asm!(
-        "
-        la      {start}, __noncacheable_bss_start__
-        la      {end}, __noncacheable_bss_end__
-
-        bgeu    {start},{end},2f
-    1:
-        sw      zero,0({start})
-        addi    {start},{start},4
-        bltu    {start},{end},1b
-    2:
-        ",
-        start = out(reg) _,
-        end = out(reg) _,
-    );
+        memory_clear_range(
+            &raw mut __noncacheable_bss_start__,
+            &raw mut __noncacheable_bss_end__,
+        );
+    }
 
     _setup_interrupts();
 
