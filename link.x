@@ -176,7 +176,9 @@ SECTIONS
     */
 
     .ahb_sram (NOLOAD) : {
+        __ahb_sram_start__ = .;
         KEEP(*(.ahb_sram))
+        __ahb_sram_end__ = .;
     } > AHB_SRAM
 
     .heap (NOLOAD) :

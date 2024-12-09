@@ -175,6 +175,9 @@ unsafe extern "C" fn _start_rust() -> ! {
 
         static mut __noncacheable_bss_start__: u32;
         static mut __noncacheable_bss_end__: u32;
+
+        static mut __ahb_sram_start__: u32;
+        static mut __ahb_sram_end__: u32;
     }
 
     unsafe {
@@ -216,6 +219,8 @@ unsafe extern "C" fn _start_rust() -> ! {
             &raw mut __noncacheable_bss_start__,
             &raw mut __noncacheable_bss_end__,
         );
+
+        memory_clear_range(&raw mut __ahb_sram_start__, &raw mut __ahb_sram_end__);
     }
 
     _setup_interrupts();
